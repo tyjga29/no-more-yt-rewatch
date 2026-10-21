@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "name": "YT Watched Blocker",
+  "version": "1.0",
+  "description": "Blocks YouTube videos you have already watched.",
+  "permissions": ["storage", "history", "unlimitedStorage"],
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*", "*://m.youtube.com/*", "*://www.youtube-nocookie.com/embed/*"],
+      "js": ["content.js"],
+      "all_frames": true,
+      "run_at": "document_start"
+    }
+  ],
+  "options_ui": { "page": "options.html" },
+  "browser_specific_settings": { "gecko": { "id": "yt-watched@local", "data_collection_permissions": { "required": ["none"] } } }
+}

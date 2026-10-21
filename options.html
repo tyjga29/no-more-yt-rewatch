@@ -1,0 +1,15 @@
+<!doctype html>
+<meta charset="utf-8">
+<p>Watched videos stored: <b id="count">…</b></p>
+<p>
+  <label>Block watched videos for <input id="days" type="number" min="0" style="width:5em" placeholder="forever"> days</label>
+  (0 = forever) <button id="saveDays">Save</button> <span id="saved"></span><br>
+  <small>After you save, you can only make the block longer, never shorter.</small>
+</p>
+<p><button id="import">Import from Firefox history</button></p>
+<p>
+  <label>Import from file (Chrome / YouTube Google Takeout export):
+    <input id="file" type="file" accept=".json,.html,.txt"></label>
+</p>
+<p id="status"></p>
+<script src="options.js"></script>
