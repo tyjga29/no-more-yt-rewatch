@@ -8,11 +8,7 @@ let marked = false;
 let played = 0; // seconds actually played, so seeks and leftover time from the previous video do not count
 let lastTime = null;
 
-// Watch pages (www and m) and embedded players (/embed/<id> on youtube.com and youtube-nocookie.com).
-function idFromUrl() {
-  if (location.pathname === "/watch") return new URLSearchParams(location.search).get("v");
-  return location.pathname.match(/^\/embed\/([\w-]{11})/)?.[1] ?? null;
-}
+const idFromUrl = () => videoIdFromUrl(location.href); // video-id.js
 
 async function check() {
   const id = idFromUrl();
@@ -42,7 +38,8 @@ check();
 // timeupdate and play do not bubble, so listen in the capture phase.
 document.addEventListener("timeupdate", (e) => {
   const v = e.target;
-  if (!currentId || blocked || marked || document.querySelector(".ad-showing")) return;
+  // Shorts preload the next videos in paused players; only the playing one counts.
+  if (v.paused || !currentId || blocked || marked || document.querySelector(".ad-showing")) return;
   if (lastTime !== null) {
     const delta = v.currentTime - lastTime;
     if (delta > 0 && delta < 2) played += delta;

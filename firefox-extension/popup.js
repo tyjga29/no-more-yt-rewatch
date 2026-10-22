@@ -5,15 +5,6 @@ async function showCount() {
   $("count").textContent = Object.keys(all).filter((k) => k.startsWith("w:")).length;
 }
 
-function videoId(url) {
-  try {
-    const u = new URL(url);
-    return u.hostname.endsWith("youtube.com") && u.pathname === "/watch" ? u.searchParams.get("v") : null;
-  } catch {
-    return null;
-  }
-}
-
 // found: Map<id, timestamp>. Keeps the newest timestamp, also against what is already stored.
 async function save(found) {
   const keys = [...found.keys()].map((id) => "w:" + id);
@@ -29,12 +20,27 @@ function remember(found, id, ts) {
   if (id) found.set(id, Math.max(ts || 0, found.get(id) || 0));
 }
 
+// Imports run in a tab (popup.html?tab): the file picker and the permission prompt close the popup.
+if (location.search === "?tab") {
+  $("openTab").hidden = true;
+  $("importSection").hidden = false;
+}
+$("openImport").onclick = () => {
+  browser.tabs.create({ url: browser.runtime.getURL("popup.html?tab") });
+  window.close();
+};
+
 $("import").onclick = async () => {
+  // history is an optional permission, so the install prompt does not ask for it. Request it first, inside the click.
+  if (!(await browser.permissions.request({ permissions: ["history"] }))) {
+    $("status").textContent = "Import cancelled: history access was not allowed.";
+    return;
+  }
   $("status").textContent = "Importing…";
-  // ponytail: history only tells us a visit happened, not how long; every visited watch URL counts as watched.
-  const items = await browser.history.search({ text: "youtube.com/watch", startTime: 0, maxResults: 1e6 });
+  // ponytail: history only tells us a visit happened, not how long; every visited video URL counts as watched.
+  const items = await browser.history.search({ text: "youtube", startTime: 0, maxResults: 1e6 });
   const found = new Map();
-  for (const { url, lastVisitTime } of items) remember(found, videoId(url), lastVisitTime);
+  for (const { url, lastVisitTime } of items) remember(found, videoIdFromUrl(url), lastVisitTime);
   save(found);
 };
 
@@ -53,15 +59,15 @@ $("file").onchange = async () => {
       const url = node.url || node.titleUrl;
       if (typeof url === "string") {
         const ts = node.time_usec ? node.time_usec / 1000 : Date.parse(node.time) || Date.now();
-        remember(found, videoId(url), ts);
+        remember(found, videoIdFromUrl(url), ts);
       }
       Object.values(node).forEach(walk);
     };
     walk(JSON.parse(text));
   } catch {
     // ponytail: no timestamps in plain text/HTML, so these count as watched now.
-    for (const m of text.matchAll(/https?:\/\/(?:www\.)?youtube\.com\/watch\?[^\s"'<>]+/g)) {
-      remember(found, videoId(m[0].replaceAll("&amp;", "&")), Date.now());
+    for (const m of text.matchAll(/https?:\/\/(?:www\.|m\.)?youtube\.com\/(?:watch\?|shorts\/)[^\s"'<>]+/g)) {
+      remember(found, videoIdFromUrl(m[0].replaceAll("&amp;", "&")), Date.now());
     }
   }
   $("file").value = "";

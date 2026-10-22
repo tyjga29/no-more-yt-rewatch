@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "No More Rewatch for YouTube",
+  "version": "1.0.0",
+  "description": "Blocks YouTube videos and Shorts that you already watched.",
+  "icons": { "48": "icon.svg", "96": "icon.svg" },
+  "permissions": ["storage", "unlimitedStorage"],
+  "optional_permissions": ["history"],
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*", "*://m.youtube.com/*", "*://www.youtube-nocookie.com/embed/*"],
+      "js": ["video-id.js", "content.js"],
+      "all_frames": true,
+      "run_at": "document_start"
+    }
+  ],
+  "browser_action": {
+    "default_icon": "icon.svg",
+    "default_title": "No More Rewatch",
+    "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": { "id": "no-more-yt-rewatch@tyjga29", "data_collection_permissions": { "required": ["none"] } }
+  }
+}
