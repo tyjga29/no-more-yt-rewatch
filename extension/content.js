@@ -21,7 +21,7 @@ async function check() {
   removeOverlay();
   if (!id) return;
   const key = "w:" + id;
-  const got = await browser.storage.local.get({ [key]: 0, blockDays: 0 });
+  const got = await ext.storage.local.get({ [key]: 0, blockDays: 0 });
   // blockDays 0 = block forever. After the block expires the video counts as new and is marked again when watched.
   const active = got[key] && (!got.blockDays || Date.now() - got[key] < got.blockDays * 86400000);
   if (active && idFromUrl() === id) {
@@ -47,7 +47,7 @@ document.addEventListener("timeupdate", (e) => {
   lastTime = v.currentTime;
   if (played >= THRESHOLD_SECONDS || (v.duration && played >= v.duration * THRESHOLD_FRACTION)) {
     marked = true;
-    browser.storage.local.set({ ["w:" + currentId]: Date.now() });
+    ext.storage.local.set({ ["w:" + currentId]: Date.now() });
   }
 }, true);
 

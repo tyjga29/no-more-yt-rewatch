@@ -1,17 +1,17 @@
 const $ = (id) => document.getElementById(id);
 
 async function showCount() {
-  const all = await browser.storage.local.get(null);
+  const all = await ext.storage.local.get(null);
   $("count").textContent = Object.keys(all).filter((k) => k.startsWith("w:")).length;
 }
 
 // found: Map<id, timestamp>. Keeps the newest timestamp, also against what is already stored.
 async function save(found) {
   const keys = [...found.keys()].map((id) => "w:" + id);
-  const existing = await browser.storage.local.get(keys);
+  const existing = await ext.storage.local.get(keys);
   const add = {};
   for (const [id, ts] of found) add["w:" + id] = Math.max(ts, existing["w:" + id] || 0);
-  await browser.storage.local.set(add);
+  await ext.storage.local.set(add);
   $("status").textContent = `Imported ${found.size} videos.`;
   showCount();
 }
@@ -26,19 +26,19 @@ if (location.search === "?tab") {
   $("importSection").hidden = false;
 }
 $("openImport").onclick = () => {
-  browser.tabs.create({ url: browser.runtime.getURL("popup.html?tab") });
+  ext.tabs.create({ url: ext.runtime.getURL("popup.html?tab") });
   window.close();
 };
 
 $("import").onclick = async () => {
   // history is an optional permission, so the install prompt does not ask for it. Request it first, inside the click.
-  if (!(await browser.permissions.request({ permissions: ["history"] }))) {
+  if (!(await ext.permissions.request({ permissions: ["history"] }))) {
     $("status").textContent = "Import cancelled: history access was not allowed.";
     return;
   }
   $("status").textContent = "Importing…";
   // ponytail: history only tells us a visit happened, not how long; every visited video URL counts as watched.
-  const items = await browser.history.search({ text: "youtube", startTime: 0, maxResults: 1e6 });
+  const items = await ext.history.search({ text: "youtube", startTime: 0, maxResults: 1e6 });
   const found = new Map();
   for (const { url, lastVisitTime } of items) remember(found, videoIdFromUrl(url), lastVisitTime);
   save(found);
@@ -78,11 +78,11 @@ $("file").onchange = async () => {
 // 0 = forever is the longest possible block, so after that nothing is longer.
 const isLonger = (want, current) => current === undefined || (current !== 0 && (want === 0 || want >= current));
 
-browser.storage.local.get("blockDays").then(({ blockDays }) => {
+ext.storage.local.get("blockDays").then(({ blockDays }) => {
   if (blockDays !== undefined) $("days").value = blockDays;
 });
 $("saveDays").onclick = async () => {
-  const { blockDays } = await browser.storage.local.get("blockDays");
+  const { blockDays } = await ext.storage.local.get("blockDays");
   const want = Math.max(0, Math.floor(Number($("days").value) || 0));
   if (!isLonger(want, blockDays)) {
     $("days").value = blockDays;
@@ -90,7 +90,7 @@ $("saveDays").onclick = async () => {
     return;
   }
   $("days").value = want;
-  await browser.storage.local.set({ blockDays: want });
+  await ext.storage.local.set({ blockDays: want });
   $("saved").textContent = "Saved.";
 };
 

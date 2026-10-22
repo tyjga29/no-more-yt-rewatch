@@ -1,7 +1,7 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "No More Rewatch for YouTube",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Blocks YouTube videos and Shorts that you already watched.",
   "icons": { "48": "icon-48.png", "96": "icon-96.png", "128": "icon-128.png" },
   "permissions": ["storage", "unlimitedStorage"],
@@ -14,7 +14,7 @@
       "run_at": "document_start"
     }
   ],
-  "browser_action": {
+  "action": {
     "default_icon": { "16": "icon-16.png", "32": "icon-32.png", "48": "icon-48.png", "96": "icon-96.png" },
     "default_title": "No More Rewatch",
     "default_popup": "popup.html"

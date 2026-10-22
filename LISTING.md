@@ -80,7 +80,7 @@ YouTube changes pages without a full reload. The extension listens for YouTube's
 
 **Storage**
 
-- Data is in `browser.storage.local`. It does not sync between devices.
+- Data is in `storage.local`. It does not sync between devices.
 - Each video is one entry: the key is `w:<video ID>` and the value is the date when you watched it (milliseconds since 1970). The block duration is in the entry `blockDays`.
 - The `unlimitedStorage` permission removes the size limit, so a large history import fits.
 
@@ -88,7 +88,7 @@ YouTube changes pages without a full reload. The extension listens for YouTube's
 
 - **Access your data for youtube.com, m.youtube.com and youtube-nocookie.com:** to find the video ID, measure playback and show the overlay. The extension does not read or change other parts of these pages.
 - **Storage / unlimited storage:** to keep the list of watched videos.
-- **Browsing history (optional):** the extension asks for this permission only when you click "Import from Firefox history". It uses it only to find YouTube video URLs. If you do not import, the extension never asks for it.
+- **Browsing history (optional):** the extension asks for this permission only when you click "Import from browser history". It uses it only to find YouTube video URLs. If you do not import, the extension never asks for it.
 
 **Privacy**
 
@@ -104,4 +104,4 @@ The extension does not send network requests, has no analytics and no tracking, 
 ---
 
 **Notes to reviewer:**
-No build step; the uploaded files are the source (https://github.com/tyjga29/no-more-yt-rewatch, folder `firefox-extension/`). The optional "history" permission is requested only when the user clicks "Import from Firefox history" on the import page, and is used only to find YouTube video URLs in the history. All data is stored only in storage.local. The extension makes no network requests.
+No build step; the uploaded files are the source (https://github.com/tyjga29/no-more-yt-rewatch, folder `extension/`). The optional "history" permission is requested only when the user clicks "Import from browser history" on the import page, and is used only to find YouTube video URLs in the history. All data is stored only in storage.local. The extension makes no network requests.

@@ -1,4 +1,8 @@
 // Shared by content.js and popup.js.
+
+// Firefox has `browser`, Chrome has `chrome`. Both return promises in Manifest V3.
+const ext = globalThis.browser ?? globalThis.chrome;
+
 // Returns the video ID of a YouTube watch, Shorts, live or embed URL, else null.
 function videoIdFromUrl(url) {
   let u;
